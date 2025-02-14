@@ -8,11 +8,11 @@ import List from "./components/List"
 import Add from "./components/Add"
 
 function App() {
-  const items = [
+  const [items, setItems] = useState([
 	  {id: 1, name: "item1", price:10},
 	  {id: 2, name: "item2", price:20}, 
 	  {id: 3, name: "item3", price:30}
-  ];
+  ]);
 
   const [count, setCount] = useState(0);
 
@@ -26,8 +26,12 @@ function App() {
 
   const add = (item) => {
     console.log('hola');
-    item.id = items.length + 1;
-    items.push(item);
+    // called a spread, is like a push [...arr, itemToPush]
+    setItems([...items, item]);
+  };
+
+  const del = (id) => {
+    setItems(items.filter((item) => item.id !== id));
   };
 
 
@@ -39,7 +43,7 @@ function App() {
 	<Button name = "suma" click={sum}/>
 	<Button name = "mensaje" click={() => alert("hola")}/>
 	<Add add={add}/>
-	<List items={items}/>
+	<List items={items} ondelete={del}/>
 	<Footer/>
     </div>
   );
