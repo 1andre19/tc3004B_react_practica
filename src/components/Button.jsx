@@ -1,5 +1,4 @@
 import React from 'react'
-
 const Button = ({ name, click }) => {
     return (
         <button onClick={click}>

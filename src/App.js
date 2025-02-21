@@ -1,12 +1,15 @@
 import logo from './logo.svg';
 import './App.css';
 import { useState } from "react";
-import Header from "./components/Header"
 import Footer from "./components/Footer"
 import Button from "./components/Button"
 import List from "./components/List"
 import Add from "./components/Add"
-import { BrowserRouter } from 'react-router-dom';
+import CredentialsSignInPage from "./components/Login"
+import ResponsiveAppBar from "./components/AppBar"
+import LandingPage from "./components/LandingPage"
+import Login from "./components/Login2"
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
     const [items, setItems] = useState([
@@ -16,6 +19,7 @@ function App() {
     ]);
 
     const [count, setCount] = useState(0);
+    const [isLogin, setIsLogin] = useState(false);
 
     const nombre = "andre";
     const elemento = <h2> hola, {nombre}</h2>;
@@ -35,21 +39,37 @@ function App() {
         setItems(items.filter((item) => item.id !== id));
     };
 
+    const login = (user) => {
+        if (user.username == "andre" && user.password == "123") {
+            setIsLogin(true);
+        }
+
+        return isLogin;
+    }
+
+    const logout = () => {
+        setIsLogin(false);
+    }
 
     return (
         <div>
             <BrowserRouter>
-                <AppBar />
+                {isLogin && <ResponsiveAppBar logout={logout} />}
+                <Routes>
+                    <Route path="/" element={<Login login={login} />} />
+                    <Route path="/home" element={<LandingPage />} />
+                    <Route path="/login" element={<Login login={login} />} />
+                    <Route path="/add" element={<Add add={add} />} />
+                    <Route path="/items" element={<List items={items} ondelete={del} />} />
+                </Routes>
                 <Footer />
             </BrowserRouter>
 
-            <Header />
             {count}
             <Button />
-            <Button name="suma" click={sum} />
+            {/*<Button name="suma" click={sum} />
             <Button name="mensaje" click={() => alert("hola")} />
-            <Add add={add} />
-            <List items={items} ondelete={del} />
+            */}
             <Footer />
         </div>
     );
