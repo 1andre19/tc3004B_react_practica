@@ -10,6 +10,7 @@ import ResponsiveAppBar from "./components/AppBar"
 import LandingPage from "./components/LandingPage"
 import Login from "./components/Login2"
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AutoFixHigh } from '@mui/icons-material';
 
 function App() {
     const [items, setItems] = useState([
@@ -29,22 +30,75 @@ function App() {
         console.log(count);
     };
 
-    const add = (item) => {
-        console.log('hola');
-        // called a spread, is like a push [...arr, itemToPush]
-        setItems([...items, item]);
+    const add = async (item) => {
+        const token = localStorage.getItem("token");
+        const result = await fetch("http://localhost:5000/items", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+        });
+        const data = await result.json();
+        setItems(data);
     };
 
-    const del = (id) => {
+    const getItems = async () => {
+        const token = localStorage.getItem("token");
+        const result = await fetch("http://localhost:5000/items", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+        });
+        const data = await result.json();
+        setItems(data);
+    }
+
+
+    const del = async (id) => {
+        const token = localStorage.getItem("token");
+        const result = await fetch("http://localhost:5000/items", {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+        });
         setItems(items.filter((item) => item.id !== id));
     };
 
-    const login = (user) => {
-        if (user.username == "andre" && user.password == "123") {
-            setIsLogin(true);
+    const login = async (user) => {
+        const result = await fetch("http://localhost:5000/login", {
+            method: "POST",
+            headers: {"content-type": "application/json"},
+            body: JSON.stringify(user),
+        });
+
+        if (!result.ok) {
+            console.log("Login failed");
+            return false;
         }
 
-        return isLogin;
+        const data = await result.json();
+
+        localStorage.setItem("token", data.token);
+        setIsLogin(data.isLogin);
+        return data.isLogin;
+    }
+
+    const register = async (user) => {
+        const result = await fetch("http://localhost:5000/create/", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(user),
+          });
+    
+          if (!result.ok) {
+            console.log("error registering user");
+            return false;
+          };
+    
+          const data = await result.json();
+          console.log(data);
+          return true;
     }
 
     const logout = () => {
