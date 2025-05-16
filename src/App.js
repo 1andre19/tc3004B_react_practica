@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Footer from "./components/Footer"
 import Button from "./components/Button"
 import List from "./components/List"
@@ -12,6 +12,8 @@ import Login from "./components/Login2"
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AutoFixHigh } from '@mui/icons-material';
 
+
+const API_URL = "https://tc3004b-backendpractica.onrender.com";
 function App() {
     const [items, setItems] = useState([
         { id: 1, name: "item1", price: 10 },
@@ -32,11 +34,12 @@ function App() {
 
     const add = async (item) => {
         const token = localStorage.getItem("token");
-        const result = await fetch("http://localhost:5000/items", {
+        const result = await fetch(`${API_URL}/items`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`
             },
+            body: JSON.stringify(item),
         });
         const data = await result.json();
         setItems(data);
@@ -44,9 +47,10 @@ function App() {
 
     const getItems = async () => {
         const token = localStorage.getItem("token");
-        const result = await fetch("http://localhost:5000/items", {
+        const result = await fetch(`${API_URL}/items`, {
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${token}`,
+                "content-type": "application/json"
             },
         });
         const data = await result.json();
@@ -56,7 +60,7 @@ function App() {
 
     const del = async (id) => {
         const token = localStorage.getItem("token");
-        const result = await fetch("http://localhost:5000/items", {
+        const result = await fetch(`${API_URL}/items/${id}`, {
             method: "DELETE",
             headers: {
                 Authorization: `Bearer ${token}`
@@ -66,9 +70,9 @@ function App() {
     };
 
     const login = async (user) => {
-        const result = await fetch("http://localhost:5000/login", {
+        const result = await fetch(`${API_URL}/login`, {
             method: "POST",
-            headers: {"content-type": "application/json"},
+            headers: { "content-type": "application/json" },
             body: JSON.stringify(user),
         });
 
@@ -85,25 +89,33 @@ function App() {
     }
 
     const register = async (user) => {
-        const result = await fetch("http://localhost:5000/create/", {
+        const result = await fetch(`${API_URL}/create/`, {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify(user),
-          });
-    
-          if (!result.ok) {
+        });
+
+        if (!result.ok) {
             console.log("error registering user");
             return false;
-          };
-    
-          const data = await result.json();
-          console.log(data);
-          return true;
+        };
+
+        const data = await result.json();
+        console.log(data);
+        return true;
     }
 
     const logout = () => {
         setIsLogin(false);
     }
+
+    useEffect(() => {
+        if (isLogin) {
+            getItems();
+        }
+    }, [isLogin]);
+
+
 
     return (
         <div>
